@@ -18,7 +18,7 @@
   <div class="menu-inner-shadow"></div>
 
   <ul class="menu-inner py-1 ps">
-    
+
     <li class="menu-item {{ (request()->is('admin/dashboard*')) ? 'open' : '' }}">
       <a href="{{route('admin.dashboard')}}" class="menu-link">
         <i class="menu-icon tf-icons ri-home-smile-line"></i>
@@ -56,31 +56,22 @@
         </li> --}}
       </ul>
     </li>
-    <li class="menu-item {{ (request()->is('admin/master*')) ? 'open' : '' }}">
-      <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
+    <li class="menu-item {{ (request()->is('admin/common_pages*')) ? 'open' : '' }}">
+      <a href="#" class="menu-link menu-toggle waves-effect">
         <i class="menu-icon tf-icons ri-stock-line"></i>
         <div>Common Pages</div>
       </a>
       <ul class="menu-sub">
-        <li class="menu-item {{ (request()->is('admin/master/why-ewent*')) ? 'open' : '' }}">
-          <a href="{{route('admin.why-ewent')}}" class="menu-link">
-            <div>Terms & Conditions</div>
-          </a>
-        </li>
-        <li class="menu-item {{ (request()->is('admin/master/why-ewent*')) ? 'open' : '' }}">
-          <a href="{{route('admin.why-ewent')}}" class="menu-link">
-            <div>Cookies Policy</div>
-          </a>
-        </li>
-        <li class="menu-item {{ (request()->is('admin/master/why-ewent*')) ? 'open' : '' }}">
-          <a href="{{route('admin.why-ewent')}}" class="menu-link">
-            <div>Privacy Policy</div>
+        <li class="menu-item {{ (request()->is('admin/common_pages*')) ? 'open' : '' }}">
+          <a href="{{ route('admin.common_pages.index') }}" class="menu-link">
+            <div>Manage Pages</div>
           </a>
         </li>
       </ul>
     </li>
-    
-   
+
+
+
     <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
       <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
     </div>

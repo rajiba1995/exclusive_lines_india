@@ -6,6 +6,7 @@ use App\Livewire\AdminLogin;
 use App\Http\Controllers\Admin\AuthController;
 use App\Livewire\Admin\{Dashboard};
 use App\Livewire\Master\{BannerIndex, FaqIndex, WhyEwentIndex};
+use App\Livewire\Admin\CommonPageIndex;
 
 // Public Route for Login
 
@@ -25,5 +26,13 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
         Route::get('/banner', BannerIndex::class)->name('admin.banner.index');
         Route::get('/why-ewent',WhyEwentIndex::class)->name('admin.why-ewent');
     });
+
+    Route::group(['prefix' => 'common_pages'], function () {
+        Route::get('/index', CommonPageIndex::class)->name('admin.common_pages.index');
+        Route::get('/edit/{id}', CommonPageIndex::class)->name('admin.common_pages.edit');
+
+    });
+
+
 
 });

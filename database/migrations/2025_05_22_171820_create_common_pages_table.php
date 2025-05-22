@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vehicle_timelines', function (Blueprint $table) {
+        Schema::create('common_pages', function (Blueprint $table) {
             $table->id();
+            $table->string('page_heading');
+            $table->text('content')->nullable();
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }
@@ -22,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vehicle_timelines');
+        Schema::dropIfExists('common_pages');
     }
 };
