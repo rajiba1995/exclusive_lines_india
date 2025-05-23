@@ -36,6 +36,16 @@
             <div>Banner</div>
           </a>
         </li>
+        <li class="menu-item {{ (request()->is('admin/master/brands*')) ? 'open' : '' }}">
+          <a href="{{route('admin.brands.index')}}" class="menu-link">
+            <div>Brands</div>
+          </a>
+        </li>
+        <li class="menu-item {{ (request()->is('admin/master/collections*')) ? 'open' : '' }}">
+          <a href="{{route('admin.collection.index')}}" class="menu-link">
+            <div>Collections</div>
+          </a>
+        </li>
         <li class="menu-item {{ (request()->is('admin/master/banner*')) ? 'open' : '' }}">
           <a href="{{route('admin.banner.index')}}" class="menu-link">
             <div>Blogs</div>

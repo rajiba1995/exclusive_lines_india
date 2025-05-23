@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vehicle_timelines', function (Blueprint $table) {
-            $table->id();
+        Schema::create('brands', function (Blueprint $table) {
+            $table->id(); // This creates a BIGINT auto-incrementing primary key
+            $table->string('name');
+            $table->boolean('status')->default(true);
+            $table->integer('positions')->default(0);
             $table->timestamps();
         });
     }
@@ -22,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vehicle_timelines');
+        Schema::dropIfExists('brands');
     }
 };

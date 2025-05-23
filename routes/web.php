@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\AdminLogin;
 use App\Http\Controllers\Admin\AuthController;
 use App\Livewire\Admin\{Dashboard};
-use App\Livewire\Master\{BannerIndex, FaqIndex, WhyEwentIndex};
+use App\Livewire\Master\{BannerIndex, FaqIndex, WhyEwentIndex,BrandIndex,CollectionIndex};
 
 // Public Route for Login
 
@@ -24,6 +24,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
     Route::group(['prefix' => 'master'], function () {
         Route::get('/banner', BannerIndex::class)->name('admin.banner.index');
         Route::get('/why-ewent',WhyEwentIndex::class)->name('admin.why-ewent');
+        Route::get('/brands',BrandIndex::class)->name('admin.brands.index');
+        Route::get('/collections',CollectionIndex::class)->name('admin.collection.index');
     });
-
 });
