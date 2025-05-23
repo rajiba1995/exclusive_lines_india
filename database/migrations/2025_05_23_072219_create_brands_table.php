@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->boolean('status')->default(true);
             $table->integer('positions')->default(0);
-            $table->timestamps();
         });
     }
 
