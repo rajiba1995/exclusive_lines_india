@@ -6,7 +6,7 @@ use App\Livewire\AdminLogin;
 use App\Http\Controllers\Admin\AuthController;
 use App\Livewire\Admin\{Dashboard};
 use App\Livewire\Master\{BannerIndex, FaqIndex, WhyEwentIndex};
-use App\Livewire\Admin\CommonPageIndex;
+use App\Livewire\Admin\{CommonPageIndex,CommonPageEdit,StoreLocationIndex};
 
 // Public Route for Login
 
@@ -29,9 +29,16 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
 
     Route::group(['prefix' => 'common_pages'], function () {
         Route::get('/index', CommonPageIndex::class)->name('admin.common_pages.index');
-        Route::get('/edit/{id}', CommonPageIndex::class)->name('admin.common_pages.edit');
+        Route::get('/edit/{id}', CommonPageEdit::class)->name('admin.common_pages.edit');
 
     });
+
+    Route::group(['prefix' => 'store_location'], function () {
+        Route::get('/index', StoreLocationIndex::class)->name('admin.store_location.index');
+
+    });
+
+    
 
 
 

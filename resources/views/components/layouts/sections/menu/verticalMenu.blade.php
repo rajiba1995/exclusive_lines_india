@@ -49,11 +49,11 @@
         <div>Website Settings</div>
       </a>
       <ul class="menu-sub">
-        {{-- <li class="menu-item {{ (request()->is('admin/master/banner*')) ? 'open' : '' }}">
-          <a href="{{route('admin.banner.index')}}" class="menu-link">
-            <div>Blogs</div>
+        <li class="menu-item {{ (request()->is('admin/store_location/index')) ? 'open' : '' }}">
+          <a href="{{route('admin.store_location.index')}}" class="menu-link">
+            <div>Store Location</div>
           </a>
-        </li> --}}
+        </li>
       </ul>
     </li>
     <li class="menu-item {{ (request()->is('admin/common_pages*')) ? 'open' : '' }}">
