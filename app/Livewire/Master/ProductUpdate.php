@@ -9,11 +9,13 @@ use App\Models\Collection;
 use App\Models\ProductSpecification;
 use App\Models\ProductGalleryImage;
 use Livewire\WithFileUploads;
+use Illuminate\Validation\Rule;
+
 use Illuminate\Support\Facades\DB;
 
-class ProductCreate extends Component
+class ProductUpdate extends Component
 {
-    use WithFileUploads;
+     use WithFileUploads;
     public $active_tab = 1;
     public $brands = [];
     public $collections = [];
@@ -24,14 +26,67 @@ class ProductCreate extends Component
     ];
     public $otherSpecifications = [];
 
-    public $status = 1, $name, $slug, $sku, $subheading, $new_arrival = true, $best_seller = false;
+    public $product_id, $status = 1, $name, $slug, $sku, $subheading, $new_arrival = true, $best_seller = false;
     public $mrp, $offer_price, $badge, $brand, $collection, $short_description, $long_description;
-    public $main_image;
+    public $main_image,$existing_main_image;
     public $gallery_images = [];
+    public $existing_gallery_images = [];
     public $manualSlug = 'false';
 
-    public function mount(){
+    public function mount($id){
+        
+        $product = Product::find($id);
+        if(!$product){
+            abort(404);
+        }
+        $this->product_id = $id;
+
+        // Assign values from the product
+        $this->status            = $product->status;
+        $this->name              = $product->name;
+        $this->slug              = $product->slug;
+        $this->sku               = $product->sku;
+        $this->subheading        = $product->subheading;
+        $this->new_arrival       = $product->new_arrival?true:false;
+        $this->best_seller       = $product->best_seller?true:false;
+        $this->mrp               = $product->mrp;
+        $this->offer_price       = $product->offer_price;
+        $this->badge             = $product->badge;
+        $this->brand             = $product->brand_id;
+        $this->collection        = $product->collection_id;
+        $this->short_description = $product->short_description;
+        $this->long_description  = $product->long_description;
+
+        $this->collections = Collection::where('brand_id',$this->brand)->orderBy('collection_name','ASC')->get();
+
+        $this->existing_main_image        = $product->image;
+        $this->existing_gallery_images   = $product->galleryImges ? $product->galleryImges : [];
+
         $this->brands = Brand::where('status', 1)->orderBy('name','ASC')->get();
+
+
+         // Fixed specifications - assuming stored as JSON or related table
+        $fixedSpecs = $product->fixedSpecifications()->where('type', 'fixed')->get();
+        foreach ($fixedSpecs as $spec) {
+            $this->fixedSpecifications[$spec->spec_name] = [
+                'spec_value' => $spec->spec_value,
+                'spec_category' => $spec->spec_category,
+                'sequence' => $spec->sequence
+            ];
+        }
+
+        // Other specifications - stored as non-fixed specs
+        $this->otherSpecifications = $product->otherSpecifications()
+        ->where('type', 'others')
+        ->get()
+        ->map(function ($spec) {
+            return [
+                'spec_name' => $spec->spec_name,
+                'spec_value' => $spec->spec_value,
+                'spec_category' => $spec->spec_category,
+                'sequence' => $spec->sequence,
+            ];
+        })->toArray();
     }
     public function InputProductName($value)
     {
@@ -85,8 +140,19 @@ class ProductCreate extends Component
         $this->validate([
             'status' => 'required',
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|alpha_dash|unique:products,slug',
-            'sku' => 'required|string|max:100|unique:products,sku',
+            'slug' => [
+                'required',
+                'string',
+                'max:255',
+                'alpha_dash',
+                Rule::unique('products', 'slug')->ignore($this->product_id), // ignore current product
+            ],
+            'sku' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('products', 'sku')->ignore($this->product_id), // ignore current product
+            ],
             'subheading' => 'nullable|string|max:255',
             'mrp' => 'required|numeric',
             'offer_price' => 'nullable|numeric|lte:mrp',
@@ -98,7 +164,7 @@ class ProductCreate extends Component
         $this->active_tab = 2; // move to next tab after validation passes
     }
 
-        public function goToNextTab()
+    public function goToNextTab()
     {
         $this->validate([
             'fixedSpecifications.*.spec_value' => 'required|string',
@@ -129,26 +195,28 @@ class ProductCreate extends Component
     public function submitForm(){
         // dd($this->all());
          $this->validate([
-            'main_image' => 'required|image|max:5048',
+            'main_image' => 'nullable|image|max:5048',
             'gallery_images.*' => 'nullable|image|max:5048',
         ]);
 
         DB::beginTransaction();
 
         try {
-            $image = null;
+            $image = $this->existing_main_image;
             if ($this->main_image) {
                 $image = storeFileWithCustomName($this->main_image, 'uploads/products');
             }
             // Example:
-            $product = Product::create([
+            $product = Product::findOrFail($this->product_id); // assuming $this->product_id is set in mount()
+
+            $product->update([
                 'status' => $this->status,
                 'name' => $this->name,
                 'slug' => $this->slug,
                 'sku' => $this->sku,
                 'subheading' => $this->subheading,
-                'new_arrival' => $this->new_arrival==true?1:0,
-                'best_seller' => $this->best_seller==true?1:0,
+                'new_arrival' => $this->new_arrival ? 1 : 0,
+                'best_seller' => $this->best_seller ? 1 : 0,
                 'mrp' => $this->mrp,
                 'offer_price' => $this->offer_price,
                 'badge' => $this->badge,
@@ -156,29 +224,39 @@ class ProductCreate extends Component
                 'collection_id' => $this->collection,
                 'short_description' => $this->short_description,
                 'long_description' => $this->long_description,
-                'image' => $image,
+                'image' => $image, // optional: update only if new image is uploaded
             ]);
 
-            // Specifications
-            foreach($this->fixedSpecifications as $f_index=>$f_spec){
-                ProductSpecification::create([
-                    'product_id'=>$product->id,
-                    'type'=>'fixed',
-                    'spec_name'=>$f_index,
-                    'spec_value'=>$f_spec['spec_value'],
-                    'sequence'=>$f_spec['sequence'],
-                ]);
+            // Fixed Specifications
+            foreach ($this->fixedSpecifications as $f_index => $f_spec) {
+                ProductSpecification::updateOrCreate(
+                    [
+                        'product_id' => $product->id,
+                        'spec_name' => $f_index,
+                        'type' => 'fixed',
+                    ],
+                    [
+                        'spec_value' => $f_spec['spec_value'],
+                        'spec_category' => $f_spec['spec_category'] ?? null,
+                        'sequence' => $f_spec['sequence'] ?? 0,
+                    ]
+                );
             }
-            // others Specifications
-            foreach($this->otherSpecifications as $o_index=>$o_spec){
-                ProductSpecification::create([
-                    'product_id'=>$product->id,
-                    'type'=>'others',
-                    'spec_name'=>$o_spec['spec_name'],
-                    'spec_value'=>$o_spec['spec_value'],
-                    'spec_category'=>$o_spec['spec_category'],
-                    'sequence'=>$o_spec['sequence'],
-                ]);
+
+            // Other Specifications
+            foreach ($this->otherSpecifications as $o_spec) {
+                ProductSpecification::updateOrCreate(
+                    [
+                        'product_id' => $product->id,
+                        'spec_name' => $o_spec['spec_name'],
+                        'type' => 'others',
+                    ],
+                    [
+                        'spec_value' => $o_spec['spec_value'],
+                        'spec_category' => $o_spec['spec_category'] ?? null,
+                        'sequence' => $o_spec['sequence'] ?? 0,
+                    ]
+                );
             }
 
             // Image Gallery
@@ -192,7 +270,7 @@ class ProductCreate extends Component
 
             DB::commit();
 
-            session()->flash('message', 'Product created successfully!');
+            session()->flash('message', 'Product updated successfully!');
             return redirect()->route('admin.product.index');
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -200,14 +278,37 @@ class ProductCreate extends Component
             // Log the error if needed: Log::error($e->getMessage());
         }
     }
-     public function removeTemporaryGalleryImage($index)
+
+    public function removeExistingGalleryImage($id)
+    {
+        $image = ProductGalleryImage::find($id);
+
+        if ($image) {
+            // Delete from storage
+            storageFileUnlink($image->image);
+
+            // Delete from database
+            $image->delete();
+
+            // Refresh list (if you're storing in $existing_gallery_images)
+            $this->existing_gallery_images = ProductGalleryImage::where('product_id', $this->product_id)->get();
+        }
+    }
+    public function removeMainImage()
+    {
+        $this->main_image = null;
+    }
+
+    public function removeTemporaryGalleryImage($index)
     {
         unset($this->gallery_images[$index]);
         $this->gallery_images = array_values($this->gallery_images); // Reindex the array
     }
+
+
     public function render()
     {
         $this->dispatch('ck_editor_load');
-        return view('livewire.master.product-create');
+        return view('livewire.master.product-update');
     }
 }

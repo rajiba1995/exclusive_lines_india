@@ -1,6 +1,22 @@
 <div>
   <div class="row mb-4">
     <div class="col-lg-12 d-flex justify-content-end">
+        <button class="btn buttons-collection btn-outline-secondary btn-sm  mx-4 waves-effect" type="button">
+          <span>
+              <span class="d-flex align-items-center">
+                <i class="icon-base ri ri-upload-2-line icon-16px me-sm-2"></i>
+              <span class="d-none d-sm-inline-block">Import Product</span>
+            </span>
+          </span>
+        </button>
+        <button class="btn buttons-collection btn-outline-secondary btn-sm mx-4 waves-effect" type="button">
+          <span>
+              <span class="d-flex align-items-center">
+                <i class="icon-base ri ri-upload-2-line icon-16px me-sm-2"></i>
+              <span class="d-none d-sm-inline-block">Import Specifications</span>
+            </span>
+          </span>
+        </button>
         <a href="{{route('admin.product.create')}}" class="btn btn-primary">
             <i class="ri-add-line ri-16px me-0 me-sm-2 align-baseline"></i>
             New Product
@@ -36,6 +52,19 @@
                   class="btn btn-danger text-white mb-0 custom-input-sm ms-2">
                   <i class="ri-restart-line"></i>
                 </button>
+                <div class="btn-group mx-4">
+                  <button class="btn buttons-collection btn-outline-secondary btn-sm dropdown-toggle waves-effect" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="d-flex align-items-center">
+                      <i class="icon-base ri ri-download-line icon-16px me-sm-2"></i> 
+                      <span class="d-none d-sm-inline-block">Export</span>
+                    </span>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Export Products</a></li>
+                    <li><a class="dropdown-item" href="#">Export Product Specifications</a></li>
+                  </ul>
+                </div>
+
               </div>
             </div>
           </div>
@@ -50,17 +79,17 @@
                   <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                     SL
                   </th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                  <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                     Name
                   </th>
                   <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                     SKU
                   </th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                    MRP
-                  </th>
-                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                    Offer Price
+                  {{-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                    Price
+                  </th> --}}
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                    Brand
                   </th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">
                     Status
@@ -74,10 +103,38 @@
                 @forelse($products as $k => $product)
                   <tr>
                     <td class="align-middle text-center">{{ $k + 1 }}</td>
-                    <td class="align-middle text-center">{{ ucwords($product->name) }}</td>
+                    <td class="align-middle text-center">
+                      <div class="d-flex justify-content-start align-items-center product-name">
+                        <div class="avatar-wrapper">
+                          <div class="avatar avatar me-2 me-sm-4 rounded-2 bg-label-secondary">
+                           <img src="{{ $product->image ? asset($product->image) : asset('assets/img/default-product.png') }}" alt="Product-9" class="rounded">
+
+                          </div>
+                        </div>
+                        <div class="d-flex flex-column">
+                          <h6 class="text-nowrap mb-0">{{ ucwords($product->name) }}</h6>
+                          <small class="text-truncate d-none d-sm-block">{{ $product->subheading }}</small>
+                        </div>
+                      </div>
+                    </td>
                     <td class="align-middle text-center">{{ ucwords($product->sku) }}</td>
-                    <td class="align-middle text-center">{{ number_format($product->mrp) }}</td>
-                    <td class="align-middle text-center">{{ number_format($product->offer_price) }}</td>
+                    {{-- <td class="align-middle">
+                      <div class="order-calculations">
+                        <div class="d-flex justify-content-start gap-4 mb-2">
+                          <span class="w-px-100 text-heading">MRP</span>
+                          <h6 class="mb-0">{{env('APP_CURRENCY')}}{{ number_format($product->mrp) }}</h6>
+                        </div>
+                        <div class="d-flex justify-content-start gap-4 mb-2">
+                          <span class="w-px-100 text-heading">Offer Price</span>
+                          <h6 class="mb-0">{{env('APP_CURRENCY')}}{{ number_format($product->offer_price)}}</h6>
+                        </div>
+                      </div>
+                    </td> --}}
+                    <td class="align-middle text-center">
+                      <span class="text-truncate d-flex align-items-center text-heading">
+                        <span class="w-px-30 h-px-30 rounded-circle d-flex justify-content-center align-items-center bg-label-info me-4"><i class="icon-base ri ri-home-6-line icon-18px"></i></span>{{$product->brand?$product->brand->name:"N/A"}}
+                      </span>
+                    </td>
                     <td class="align-middle text-center">
                       <div class="form-check form-switch">
                         <input class="form-check-input ms-auto" type="checkbox"
@@ -87,11 +144,11 @@
                       </div>
                     </td>
                     <td class="align-middle text-end px-4">
-                      <button wire:click="edit({{ $product->id }})"
+                      <a href="{{route('admin.product.edit',$product->id)}}"
                         class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect"
                         title="Edit">
                         <i class="ri-edit-box-line ri-20px text-info"></i>
-                      </button>
+                      </a>
                       <button wire:click="confirmDelete({{ $product->id }})"
                         class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect"
                         title="Delete">
@@ -127,8 +184,8 @@
          window.addEventListener('showConfirm', function (event) {
             let itemId = event.detail[0].itemId;
             Swal.fire({
-                title: "Delete Brand?",
-                text: "Are you sure you want to delete the brand?",
+                title: "Delete Product?",
+                text: "Are you sure you want to delete the product?",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",

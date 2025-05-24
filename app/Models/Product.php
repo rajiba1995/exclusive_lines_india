@@ -21,12 +21,12 @@ class Product extends Model
     public function fixedSpecifications() {
         return $this->hasMany(ProductSpecification::class)->where('type', 'fixed');
     }
-    public function galleyImges() {
+    public function galleryImges() {
         return $this->hasMany(ProductGalleryImage::class);
     }
 
     public function otherSpecifications() {
-        return $this->hasMany(ProductSpecification::class)->where('type', 'other');
+        return $this->hasMany(ProductSpecification::class)->where('type', 'others');
     }
         
 }

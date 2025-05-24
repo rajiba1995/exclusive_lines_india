@@ -30,7 +30,7 @@ class ProductIndex extends Component
             storageFileUnlink($product->image);
 
             // Delete gallery images
-            foreach ($product->galleyImges as $galleryImage) {
+            foreach ($product->galleryImges as $galleryImage) {
 
                 storageFileUnlink($galleryImage->image_path);
                 $galleryImage->delete(); // Delete the DB record
@@ -51,6 +51,24 @@ class ProductIndex extends Component
             session()->flash('error', 'Failed to delete product: ' . $e->getMessage());
         }
     }
+
+    public function toggleStatus($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->status = !$product->status;
+        $product->save();
+
+        session()->flash('message', 'product status updated successfully!');
+        $this->refreshPage();
+    }
+    public function UpdateSearch($value){
+        $this->search = $value;
+        $this->resetPage();
+    }
+    public function refreshPage(){
+         $this->resetPage(); // This will reset the pagination to page 1
+         $this->reset(['search']);
+    }
     public function render()
     {
          $products = Product::when($this->search, function ($query) {
@@ -64,6 +82,10 @@ class ProductIndex extends Component
                     ->Orwhere('long_description', 'like', $searchTerm)
                     ->Orwhere('badge', 'like', $searchTerm)
                     ->Orwhere('brochure', 'like', $searchTerm);
+                })->orWhereHas('brand', function ($q) use ($searchTerm) {
+                    $q->where('name', 'like', $searchTerm);
+                })->orWhereHas('collection', function ($q) use ($searchTerm) {
+                    $q->where('collection_name', 'like', $searchTerm);
                 });
             })
             ->orderBy('name', 'ASC')

@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\AdminLogin;
 use App\Http\Controllers\Admin\AuthController;
 use App\Livewire\Admin\{Dashboard};
-use App\Livewire\Master\{BannerIndex, FaqIndex, WhyEwentIndex,BrandIndex,CollectionIndex,ProductIndex,ProductCreate};
+use App\Livewire\Master\{BannerIndex, FaqIndex, WhyEwentIndex,BrandIndex,CollectionIndex,ProductIndex,ProductCreate,ProductUpdate};
 use App\Livewire\Admin\{CommonPageIndex,CommonPageEdit,StoreLocationIndex};
 
 // Public Route for Login
@@ -29,6 +29,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
         Route::get('/collections',CollectionIndex::class)->name('admin.collection.index');
         Route::get('/products',ProductIndex::class)->name('admin.product.index');
         Route::get('/product/create',ProductCreate::class)->name('admin.product.create');
+        Route::get('/product/edit/{id}',ProductUpdate::class)->name('admin.product.edit');
     });
     Route::group(['prefix' => 'common_pages'], function () {
         Route::get('/index', CommonPageIndex::class)->name('admin.common_pages.index');

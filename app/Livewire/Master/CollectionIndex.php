@@ -34,7 +34,7 @@ class CollectionIndex extends Component
     public function mount(){
         $this->brands = Brand::where('status',1)->orderBy('name','ASC')->get();
     }
-   public function UpdateSearch($value){
+    public function UpdateSearch($value){
         $this->search = $value;
         $this->resetPage();
     }

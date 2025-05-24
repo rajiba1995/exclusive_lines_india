@@ -4,8 +4,9 @@
         <div class="h-100">
             <h5 class="mb-0">Master Management</h5>
             <div>
-            <small class="text-dark fw-medium">Product </small>
-            <small class="text-light fw-medium arrow">Create</small>
+                <small class="text-dark fw-medium">Product </small>
+                <small class="text-light fw-medium arrow">Update</small>
+                <small class="text-light fw-medium arrow">{{$name}}</small>
             </div>
         </div>
         </div>
@@ -268,12 +269,26 @@
                                         <input type="file" class="form-control" wire:model="main_image" accept="image/*">
                                         @error('main_image') <small class="text-danger">{{ $message }}</small> @enderror
 
-                                        @if ($main_image)
-                                            <div class="mt-2">
+                                        {{-- Show uploaded temp image preview --}}
+                                        @if ($main_image && is_object($main_image))
+                                            <div class="mt-2 image-thumbnail-wrapper">
                                                 <img src="{{ $main_image->temporaryUrl() }}" class="img-thumbnail" style="max-height: 200px;" />
+                                                <button type="button"
+                                                        class="image-remove-btn"
+                                                        wire:click="removeMainImage"
+                                                        title="Remove">
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        
+                                        {{-- Show existing image if no temp image selected --}}
+                                        @elseif($existing_main_image)
+                                            <div class="mt-2">
+                                                <img src="{{ asset($existing_main_image) }}" class="img-thumbnail" style="max-height: 200px;" />
                                             </div>
                                         @endif
                                     </div>
+
 
                                     <!-- Gallery Images -->
                                     <div class="col-md-6">
@@ -281,7 +296,8 @@
                                         <input type="file" class="form-control" wire:model="gallery_images" accept="image/*" multiple>
                                         @error('gallery_images.*') <small class="text-danger">{{ $message }}</small> @enderror
 
-                                       @if ($gallery_images)
+                                        <!-- Temporary image previews -->
+                                         @if ($gallery_images)
                                             <div class="mt-2 d-flex flex-wrap gap-2">
                                                 @foreach ($gallery_images as $index => $image)
                                                     <div class="image-thumbnail-wrapper">
@@ -289,7 +305,7 @@
                                                         
                                                         <!-- Remove Button -->
                                                         <button type="button"
-                                                                class="image-remove-btn btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle"
+                                                                class="image-remove-btn"
                                                                 wire:click="removeTemporaryGalleryImage({{ $index }})"
                                                                 title="Remove">
                                                             <i class="ri-close-line"></i>
@@ -298,6 +314,25 @@
                                                 @endforeach
                                             </div>
                                         @endif
+
+                                        @if ($existing_gallery_images)
+                                            <div class="mt-2 d-flex flex-wrap gap-2">
+                                                @foreach ($existing_gallery_images as $index => $existing_image)
+                                                    <div class="image-thumbnail-wrapper">
+                                                        <img src="{{ asset($existing_image->image) }}" class="img-thumbnail" style="max-height: 100px;">
+
+                                                        <!-- Delete button -->
+                                                        <button type="button"
+                                                                class="image-remove-btn"
+                                                                wire:click="removeExistingGalleryImage({{ $existing_image->id }})"
+                                                                title="Delete">
+                                                            <i class="ri-close-line"></i>
+                                                        </button>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+
                                     </div>
                                 </div>
 
@@ -305,7 +340,7 @@
                                     <button wire:click="validateStepOne" class="btn btn-outline-secondary btn-sm">
                                         <i class="ri-arrow-left-line"></i> Previous
                                     </button>
-                                    <button wire:click="submitForm" class="btn btn-primary btn-sm">Submit</button>
+                                    <button wire:click="submitForm" class="btn btn-primary btn-sm">Update</button>
                                 </div>
                             @endif
 
@@ -317,7 +352,7 @@
         </div>
     </div>
      {{-- Global Loader --}}
-    <div wire:loading class="loader-container" wire:target="validateStepOne,TabChange,UpdateBrand,setmanualSlug,addOtherSpecification,removeOtherSpecification,goToNextTab,submitForm,removeTemporaryGalleryImage">
+    <div wire:loading class="loader-container" wire:target="validateStepOne,TabChange,UpdateBrand,setmanualSlug,addOtherSpecification,removeOtherSpecification,goToNextTab,submitForm,removeExistingGalleryImage,removeTemporaryGalleryImage">
         <div class="loader"></div>
     </div>
 </div>
