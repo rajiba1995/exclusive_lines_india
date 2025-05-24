@@ -8,12 +8,23 @@
                 New Collection
             </button>
         </div>
+        <div class="col-lg-12">
+            @if (session()->has('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+        </div>
     @else
         <div class="col-lg-12 d-flex justify-content-end">
             <button type="button" class="btn btn-dark btn-sm waves-effect waves-light" wire:click="ActiveCreateTab(1)" role="button">
                 <i class="ri-arrow-go-back-line"></i> Back
             </button>
         </div>
+        <div class="col-lg-12">
+            @if (session()->has('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+        </div>
+        
     @endif
     @if($active_tab==2)
     <div class="col-lg-12 col-md-6 mb-md-0 my-4">
@@ -21,8 +32,8 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5>New collection</h5>
-                        <form wire:submit.prevent="newSubmit">
+                        <h5>{{ $collectionId ? 'Update collection' : 'New collection' }}</h5>
+                        <form wire:submit.prevent="{{ $collectionId ? 'updateSubmit' : 'newSubmit' }}">
                             <!-- Coupon Code -->
                             <div class="row">
                                 <div class="col-4 mb-3">
@@ -30,7 +41,7 @@
                                     <select 
                                         class="form-select @error('brand') is-invalid @enderror" 
                                         id="brand" 
-                                        wire:model="brand" wire:change="ChangeDiscountType($event.target.value)">
+                                        wire:model="brand">
                                         <option value="" hidden>Select brand</option>
                                         @foreach ($brands as $brand_item)
                                             <option value="{{$brand_item->id}}">{{ucwords($brand_item->name)}}</option>
@@ -54,17 +65,23 @@
                                 <div class="col-4 mb-3">
                                     <label for="slug" class="form-label d-flex justify-content-between">
                                         <span>Slug <span class="text-danger">*</span></span>
-                                        <button type="button" class="btn btn-link btn-sm" wire:click="$set('manualSlug', true)">
-                                            Make Manually
-                                        </button>
+                                        @if($manualSlug=='false')
+                                            <button type="button" class="btn btn-link btn-sm" wire:click="setmanualSlug('{{$manualSlug}}')">
+                                                Make Manually
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn btn-link btn-sm" wire:click="setmanualSlug('{{$manualSlug}}')">
+                                                Auto Generated
+                                            </button>
+                                        @endif
                                     </label>
                                     <input 
                                         type="text" 
                                         class="form-control @error('slug') is-invalid @enderror" 
                                         id="slug" 
-                                        placeholder="Auto-generated slug" 
+                                        placeholder="{{ $manualSlug=='true' ? 'Enter slug manually' : 'Auto-generated slug' }}" 
                                         wire:model="slug"
-                                        @if(!$manualSlug) disabled @endif
+                                        @if($manualSlug=='false') disabled @endif
                                     >
                                     @error('slug') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
@@ -72,6 +89,11 @@
                                 <!-- Start Date -->
                                 <div class="col-6 mb-3">
                                     <label for="collection_image" class="form-label">Collection Image<span class="text-danger">*</span></label>
+                                    @if($collectionId && $collection_image_path)
+                                        <div class="mb-2">
+                                            <img src="{{ asset($collection_image_path) }}" alt="collection Image" class="img-thumbnail" style="max-height: 120px;">
+                                        </div>
+                                    @endif
                                     <input 
                                         type="file" 
                                         class="form-control @error('collection_image') is-invalid @enderror" 
@@ -82,6 +104,11 @@
                                 </div>
                                 <div class="col-6 mb-3">
                                     <label for="banner" class="form-label">Banner Image<span class="text-danger">*</span></label>
+                                    @if($collectionId && $banner_path)
+                                        <div class="mb-2">
+                                            <img src="{{ asset($banner_path) }}" alt="Banner Image" class="img-thumbnail" style="max-height: 120px;">
+                                        </div>
+                                    @endif
                                     <input 
                                         type="file" 
                                         class="form-control @error('banner') is-invalid @enderror" 
@@ -107,149 +134,6 @@
             </div>
         </div>
     </div>
-    @elseif($active_tab==3)
-        <div class="col-lg-12 col-md-6 mb-md-0 my-4">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5>Edit Offer</h5>
-                            <form wire:submit.prevent="updateOffer">
-                                <!-- Coupon Code -->
-                                <div class="row">
-                                    <div class="col-3 mb-3">
-                                        <label for="couponCode" class="form-label">Coupon Code<span class="text-danger">*</span></label>
-                                        <input 
-                                            type="text" 
-                                            class="form-control @error('couponCode') is-invalid @enderror" 
-                                            id="couponCode" 
-                                            placeholder="Enter coupon code" 
-                                            wire:model="couponCode"
-                                        >
-                                        @error('couponCode') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <!-- Start Date -->
-                                    <div class="col-3 mb-3">
-                                        <label for="startDate" class="form-label">Start Date<span class="text-danger">*</span></label>
-                                        <input 
-                                            type="datetime-local" 
-                                            class="form-control @error('startDate') is-invalid @enderror" 
-                                            id="startDate" 
-                                            wire:model="startDate"
-                                        >
-                                        @error('startDate') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                            
-                                    <!-- End Date -->
-                                    <div class="col-3 mb-3">
-                                        <label for="endDate" class="form-label">End Date<span class="text-danger">*</span></label>
-                                        <input 
-                                            type="datetime-local" 
-                                            class="form-control @error('endDate') is-invalid @enderror" 
-                                            id="endDate" 
-                                            wire:model="endDate"
-                                        >
-                                        @error('endDate') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <!-- Discount Type -->
-                                    <div class="col-3 mb-3">
-                                        <label for="editDiscountType" class="form-label">Discount Type<span class="text-danger">*</span></label>
-                                        <select 
-                                            class="form-select @error('discountType') is-invalid @enderror" 
-                                            id="editDiscountType" 
-                                            wire:model="discountType" wire:change="ChangeDiscountType($event.target.value)">
-                                            <option value="" hidden>Select discount type</option>
-                                            <option value="flat">Flat Discount</option>
-                                            <option value="percentage">Percentage Discount</option>
-                                        </select>
-                                        @error('discountType') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <!-- Discount Value -->
-                                    <div class="col-3 mb-3">
-                                        <label for="discountValue" class="form-label">Discount Value 
-                                        <span class="text-danger">  
-                                                @if ($active_dis_value === 'flat')
-                                                    (Flat)
-                                                @elseif ($active_dis_value === 'percentage')
-                                                    (%)
-                                                @endif
-                                            </span><span class="text-danger">*</span>
-                                        </label>
-                                        <input 
-                                            type="number" 
-                                            class="form-control @error('discountValue') is-invalid @enderror" 
-                                            id="discountValue" 
-                                            placeholder="Enter discount value" 
-                                            wire:model="discountValue"
-                                        >
-                                        @error('discountValue') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <!-- Minimum Order Amount -->
-                                    <div class="col-3 mb-3">
-                                        <label for="minOrderAmount" class="form-label">Minimum Order Amount<span class="text-danger">*</span></label>
-                                        <input 
-                                            type="number" 
-                                            class="form-control @error('minOrderAmount') is-invalid @enderror" 
-                                            id="minOrderAmount" 
-                                            placeholder="Enter minimum order amount" 
-                                            wire:model="minOrderAmount"
-                                        >
-                                        @error('minOrderAmount') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <!-- Minimum Order Amount -->
-                                    <div class="col-3 mb-3">
-                                        <label for="maximum_discount" class="form-label">Maximum Discount Amount</label>
-                                        <input 
-                                            type="number" 
-                                            class="form-control @error('maximum_discount') is-invalid @enderror" 
-                                            id="maximum_discount" 
-                                            placeholder="Enter maximum discount" 
-                                            wire:model="maximum_discount"
-                                        >
-                                        @error('maximum_discount') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    
-                                    <!-- Usage Limit -->
-                                    <div class="col-3 mb-3">
-                                        <label for="usageLimit" class="form-label">Global Usage Limit (optional)</label>
-                                        <input 
-                                            type="number" 
-                                            class="form-control @error('usageLimit') is-invalid @enderror" 
-                                            id="usageLimit" 
-                                            placeholder="Enter global usage limit" 
-                                            wire:model="usageLimit"
-                                        >
-                                        @error('usageLimit') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                            
-                                    <!-- Usage Per User -->
-                                    <div class="col-3 mb-3">
-                                        <label for="usagePerUser" class="form-label">Usage Per User (optional)</label>
-                                        <input 
-                                            type="number" 
-                                            class="form-control @error('usagePerUser') is-invalid @enderror" 
-                                            id="usagePerUser" 
-                                            placeholder="Enter usage limit per user" 
-                                            wire:model="usagePerUser"
-                                        >
-                                        @error('usagePerUser') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                </div>
-                            
-                                <!-- Submit Button -->
-                                <div class="text-end">
-                                    <button type="submit" class="btn btn-primary btn-sm">Update</button>
-                                    <button type="button" class="btn btn-dark btn-sm waves-effect waves-light" wire:click="resetForm">Cancel</button>
-                                </div>
-                            </form>
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     @else
         <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
         <div class="card my-4">
@@ -307,7 +191,7 @@
                         <td class="align-middle text-center">{{ ucwords($collection_item->collection_name) }}</td>
                         <td class="align-middle text-center">{{ ucwords($collection_item->brand?$collection_item->brand->name:"N/A") }}</td>
                         <td class="align-middle text-end px-4">
-                        <button wire:click="edit({{ $collection_item->id }})"
+                        <button wire:click="editCollection({{ $collection_item->id }})"
                             class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect"
                             title="Edit">
                             <i class="ri-edit-box-line ri-20px text-info"></i>
@@ -349,8 +233,8 @@
          window.addEventListener('showConfirm', function (event) {
             let itemId = event.detail[0].itemId;
             Swal.fire({
-                title: "Delete Brand?",
-                text: "Are you sure you want to delete the brand?",
+                title: "Delete Collection?",
+                text: "Are you sure you want to delete the colletion?",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",

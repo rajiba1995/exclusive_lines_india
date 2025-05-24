@@ -46,9 +46,9 @@
             <div>Collections</div>
           </a>
         </li>
-        <li class="menu-item {{ (request()->is('admin/master/banner*')) ? 'open' : '' }}">
-          <a href="{{route('admin.banner.index')}}" class="menu-link">
-            <div>Blogs</div>
+        <li class="menu-item {{ (request()->is('admin/master/product*')) ? 'open' : '' }}">
+          <a href="{{route('admin.product.index')}}" class="menu-link">
+            <div>Products</div>
           </a>
         </li>
       </ul>

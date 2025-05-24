@@ -16,6 +16,7 @@ class BrandIndex extends Component
 
     public $brandId, $name, $status;
     public $search = '';
+    protected $paginationTheme = 'bootstrap';
 
     protected $rules = [
         'name' => 'required|string|max:255',
