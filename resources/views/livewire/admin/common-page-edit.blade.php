@@ -6,8 +6,8 @@
                     <div class="d-flex justify-content-between mb-3">
                         <h5>Update {{ucwords($pageName)}}</h5>
                         <a href="{{route('admin.common_pages.index')}}"
-                            class="btn btn-danger text-white mb-0 custom-input-sm ms-2">
-                            < Back </a>
+                            class="btn btn-dark btn-sm waves-effect waves-light">
+                            <i class="ri-arrow-go-back-line"></i> Back </a>
                     </div>
                     <form wire:submit.prevent="update">
                         <div class="row">

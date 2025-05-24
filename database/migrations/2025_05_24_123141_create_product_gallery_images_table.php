@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stock_ledgers', function (Blueprint $table) {
+        Schema::create('product_gallery_images', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
-            $table->integer('quantity')->default(0);
-            $table->enum('type', ['Credit', 'Debit']); // Tracks whether stock is added or removed
-            $table->enum('purpose', ['Rent', 'Sell']); // Tracks whether stock is added or removed
+            $table->string('image')->nullable();
+
             $table->timestamps();
 
+            // Foreign key constraint
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stock_ledgers');
+        Schema::dropIfExists('product_gallery_images');
     }
 };

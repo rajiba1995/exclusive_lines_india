@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('common_pages', function (Blueprint $table) {
-            $table->id();
-            $table->string('page_heading');
-            $table->text('content')->nullable();
-            $table->boolean('status')->default(1);
-            $table->timestamps();
+        Schema::create('brands', function (Blueprint $table) {
+            $table->id(); // This creates a BIGINT auto-incrementing primary key
+            $table->string('name');
+            $table->boolean('status')->default(true);
+            $table->integer('positions')->default(0);
+             $table->timestamps();
         });
     }
 
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('common_pages');
+        Schema::dropIfExists('brands');
     }
 };

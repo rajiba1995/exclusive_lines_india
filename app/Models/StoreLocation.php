@@ -16,4 +16,8 @@ class StoreLocation extends Model
         'outlet_type', 
         'uploaded_by'
     ];
+
+    public function brands(){
+        return $this->belongsToMany(Brand::class);
+    }
 }

@@ -36,33 +36,43 @@
             <div>Banner</div>
           </a>
         </li>
-        <li class="menu-item {{ (request()->is('admin/master/banner*')) ? 'open' : '' }}">
-          <a href="{{route('admin.banner.index')}}" class="menu-link">
-            <div>Blogs</div>
+        <li class="menu-item {{ (request()->is('admin/master/brands*')) ? 'open' : '' }}">
+          <a href="{{route('admin.brands.index')}}" class="menu-link">
+            <div>Brands</div>
+          </a>
+        </li>
+        <li class="menu-item {{ (request()->is('admin/master/collections*')) ? 'open' : '' }}">
+          <a href="{{route('admin.collection.index')}}" class="menu-link">
+            <div>Collections</div>
+          </a>
+        </li>
+        <li class="menu-item {{ (request()->is('admin/master/product*')) ? 'open' : '' }}">
+          <a href="{{route('admin.product.index')}}" class="menu-link">
+            <div>Products</div>
           </a>
         </li>
       </ul>
     </li>
-    <li class="menu-item {{ (request()->is('admin/master*')) ? 'open' : '' }}">
+    <li class="menu-item {{ (request()->is('admin/store-location*')) ? 'open' : '' }}">
       <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
         <i class="menu-icon tf-icons ri-stock-line"></i>
         <div>Website Settings</div>
       </a>
       <ul class="menu-sub">
-        <li class="menu-item {{ (request()->is('admin/store_location/index')) ? 'open' : '' }}">
+        <li class="menu-item {{ (request()->is('admin/store-location/index')) ? 'open' : '' }}">
           <a href="{{route('admin.store_location.index')}}" class="menu-link">
             <div>Store Location</div>
           </a>
         </li>
       </ul>
     </li>
-    <li class="menu-item {{ (request()->is('admin/common_pages*')) ? 'open' : '' }}">
+    <li class="menu-item {{ (request()->is('admin/common-pages*')) ? 'open' : '' }}">
       <a href="#" class="menu-link menu-toggle waves-effect">
         <i class="menu-icon tf-icons ri-stock-line"></i>
         <div>Common Pages</div>
       </a>
       <ul class="menu-sub">
-        <li class="menu-item {{ (request()->is('admin/common_pages*')) ? 'open' : '' }}">
+        <li class="menu-item {{ (request()->is('admin/common-pages*')) ? 'open' : '' }}">
           <a href="{{ route('admin.common_pages.index') }}" class="menu-link">
             <div>Manage Pages</div>
           </a>

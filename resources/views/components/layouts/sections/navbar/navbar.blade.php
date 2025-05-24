@@ -50,7 +50,7 @@ $adminUser = Auth::guard('admin')->user();
 
           <!-- Place this tag where you want the button to render. -->
           <li class="nav-item lh-1 me-4">
-            <a href="#">{{$adminUser->name}}</a>
+            {{-- <a href="#">{{$adminUser->name}}</a> --}}
           </li>
 
           <!-- User -->
